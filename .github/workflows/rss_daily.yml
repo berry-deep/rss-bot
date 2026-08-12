@@ -1,0 +1,32 @@
+name: RSS Daily Push
+
+on:
+  schedule:
+    # 北京时间 (UTC+8) 每天 14:40 → UTC 06:40
+    - cron: '40 6 * * *'
+  workflow_dispatch:   # 允许手动在 GitHub 页面点击触发
+
+jobs:
+  rss-push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install feedparser requests openai
+
+      - name: Run RSS push script
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+        run: python rss_push.py
