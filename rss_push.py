@@ -33,10 +33,10 @@ TIMEOUT      = 15   # 文章抓取超时（秒）
 MAX_ARTICLES = 20   # 最多抓取文章数，防止跑太久
 SLEEP_RANGE  = (1, 3)   # 两次请求之间随机休眠秒数
 
-# ── AI 大模型配置（兼容 OpenAI 格式，如 DeepSeek / MiniMax / Azure OpenAI 等）───
-API_KEY    = __import__("os").environ.get("OPENAI_API_KEY",    "sk-2cfba62823870e5a72bcb18c0d5cab4a335dd48dc3b619aa0a865487d10652c8")
-BASE_URL   = __import__("os").environ.get("OPENAI_BASE_URL",   "https://api.183399.xyz/v1")
-MODEL_NAME = __import__("os").environ.get("OPENAI_MODEL",      "deepseek-v4-pro")
+# ── AI 大模型配置（OpenAI 兼容格式；当前走 OpenRouter）───────────────
+API_KEY    = __import__("os").environ.get("OPENAI_API_KEY",    "")
+BASE_URL   = __import__("os").environ.get("OPENAI_BASE_URL",   "https://openrouter.ai/api/v1")
+MODEL_NAME = __import__("os").environ.get("OPENAI_MODEL",      "deepseek/deepseek-chat-v3.1:free")
 AI_TIMEOUT = 120   # 大模型请求超时（秒）
 
 SYSTEM_PROMPT = (
@@ -165,7 +165,15 @@ def ai_translate(articles: list[dict]) -> str:
 
     user_content = "\n\n".join(sections)
 
-    client = OpenAI(api_key=API_KEY, base_url=BASE_URL, timeout=AI_TIMEOUT)
+    client = OpenAI(
+        api_key=API_KEY,
+        base_url=BASE_URL,
+        timeout=AI_TIMEOUT,
+        default_headers={
+            "HTTP-Referer": "https://github.com/berry-deep/rss-bot",
+            "X-Title":      "RSS Daily Push",
+        },
+    )
 
     response = client.chat.completions.create(
         model=MODEL_NAME,
@@ -296,3 +304,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+sync rss_push.py: switch to OpenRouter
