@@ -2,9 +2,12 @@ name: RSS Daily Push
 
 on:
   schedule:
-    - cron: '0 22 * * *'    #北京时间 (UTC+8) 每天 06:00 → UTC 22:00
+    - cron: '0 22 * * *'   # UTC 22:00 = 北京时间 06:00
 
-  workflow_dispatch:        #允许手动在 GitHub 页面点击触发
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   rss-push:
